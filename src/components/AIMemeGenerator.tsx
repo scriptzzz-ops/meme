@@ -20,30 +20,21 @@ const AIMemeGenerator: React.FC<AIMemeGeneratorProps> = ({ onMemeGenerated }) =>
     setError('');
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/generate-meme', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({ prompt }),
-      // });
-      
-      // const data = await response.json();
-      
-      // Placeholder for demonstration - replace with actual API response
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API delay
-      
-      // Mock response - replace with actual API data
-      const mockResponse = {
-        imageUrl: 'https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&w=400',
-        topText: 'WHEN YOU ASK FOR AI MEMES',
-        bottomText: 'BUT GET PLACEHOLDER CATS'
-      };
-      
-      onMemeGenerated(mockResponse.imageUrl, mockResponse.topText, mockResponse.bottomText);
-      setPrompt('');
-      
+      const response = await fetch('http://localhost:3001/api/generate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        onMemeGenerated(data.imageUrl, 'AI Generated', 'Meme');
+        setPrompt('');
+      } else {
+        throw new Error(data.error || 'Image generation failed');
+      }
+
     } catch (err) {
       setError('Failed to generate meme. Please try again.');
       console.error('AI meme generation error:', err);
@@ -68,7 +59,6 @@ const AIMemeGenerator: React.FC<AIMemeGeneratorProps> = ({ onMemeGenerated }) =>
 
   return (
     <div className="space-y-3">
-      {/* Prompt Input */}
       <div>
         <label className="block text-xs font-medium text-gray-700 mb-1">
           Describe your meme idea
@@ -89,14 +79,12 @@ const AIMemeGenerator: React.FC<AIMemeGeneratorProps> = ({ onMemeGenerated }) =>
         </div>
       </div>
 
-      {/* Error Message */}
       {error && (
         <div className="p-2 bg-red-50 border border-red-200 rounded-md">
           <p className="text-xs text-red-600">{error}</p>
         </div>
       )}
 
-      {/* Generate Button */}
       <button
         onClick={generateAIMeme}
         disabled={isGenerating || !prompt.trim()}
@@ -115,7 +103,6 @@ const AIMemeGenerator: React.FC<AIMemeGeneratorProps> = ({ onMemeGenerated }) =>
         )}
       </button>
 
-      {/* Suggestions */}
       <div>
         <p className="text-xs font-medium text-gray-700 mb-1">Need inspiration?</p>
         <div className="space-y-1">
@@ -132,17 +119,13 @@ const AIMemeGenerator: React.FC<AIMemeGeneratorProps> = ({ onMemeGenerated }) =>
         </div>
       </div>
 
-      {/* API Status Indicator */}
-      <div className="p-2 bg-amber-50 border border-amber-200 rounded-md">
+      <div className="p-2 bg-green-50 border border-green-200 rounded-md">
         <div className="flex items-center gap-2">
-          <RefreshCw className="h-3 w-3 text-amber-600" />
-          <p className="text-xs text-amber-700">
-            <strong>API Integration Pending:</strong> Ready for your API configuration
+          <RefreshCw className="h-3 w-3 text-green-600" />
+          <p className="text-xs text-green-700">
+            <strong>API Connected:</strong> Using backend proxy
           </p>
         </div>
-        <p className="text-xs text-amber-600">
-          Currently showing placeholder responses for demonstration
-        </p>
       </div>
     </div>
   );
