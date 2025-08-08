@@ -1,0 +1,25 @@
+{
+  "name": "perchance-ai-proxy",
+  "version": "1.0.0",
+  "description": "Express proxy server for Perchance AI image generation",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["express", "proxy", "ai", "image-generation", "perchance"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17"
+  }
+}
