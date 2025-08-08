@@ -37,9 +37,19 @@ const MemeGenerator: React.FC = () => {
     
     const img = new Image();
     img.crossOrigin = 'anonymous';
+    
     img.onload = () => {
-      drawMemeOnCanvas(previewRef.current!, img, topText, bottomText);
+      try {
+        drawMemeOnCanvas(previewRef.current!, img, topText, bottomText);
+      } catch (error) {
+        console.error('Error drawing meme on canvas:', error);
+      }
     };
+    
+    img.onerror = (error) => {
+      console.error('Error loading image:', error);
+    };
+    
     img.src = selectedImage;
   }, [selectedImage, topText, bottomText]);
 
@@ -52,21 +62,41 @@ const MemeGenerator: React.FC = () => {
     
     const img = new Image();
     img.crossOrigin = 'anonymous';
+    
     img.onload = () => {
-      // Use high resolution for download
-      canvasRef.current!.width = img.width;
-      canvasRef.current!.height = img.height;
-      
-      const downloadTopText = { ...topText, fontSize: topText.fontSize * 2 };
-      const downloadBottomText = { ...bottomText, fontSize: bottomText.fontSize * 2 };
-      
-      drawMemeOnCanvas(canvasRef.current!, img, downloadTopText, downloadBottomText);
-      
-      const link = document.createElement('a');
-      link.download = 'meme.png';
-      link.href = canvasRef.current!.toDataURL();
-      link.click();
+      try {
+        // Use high resolution for download
+        const canvas = canvasRef.current!;
+        canvas.width = Math.min(img.width, 1920); // Max width 1920px
+        canvas.height = Math.min(img.height, 1920); // Max height 1920px
+        
+        // Scale font sizes for high resolution
+        const scale = Math.min(canvas.width / 500, canvas.height / 500);
+        const downloadTopText = { ...topText, fontSize: Math.max(topText.fontSize * scale, 24) };
+        const downloadBottomText = { ...bottomText, fontSize: Math.max(bottomText.fontSize * scale, 24) };
+        
+        drawMemeOnCanvas(canvas, img, downloadTopText, downloadBottomText);
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.download = `meme-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png', 0.95);
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error('Error downloading meme:', error);
+        alert('Error downloading meme. Please try again.');
+      }
     };
+    
+    img.onerror = (error) => {
+      console.error('Error loading image for download:', error);
+      alert('Error loading image for download. Please try again.');
+    };
+    
     img.src = selectedImage;
   };
 
